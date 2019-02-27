@@ -1,0 +1,688 @@
+<style>
+    paper-checkbox {
+        --paper-checkbox-checked-color: darkseagreen;
+    }
+    /*
+  paper-button.top-right {
+        position: relative;
+    margin-left: 81%;
+    }
+*/
+    /*
+.top-right .content.paper-button {
+    padding: 0.65em 0.57em;
+}
+*/
+    /*
+.paper-button-0 .content.paper-button {
+  padding: 0.2em 0.57em
+}
+*/
+    
+    #updateBtn {
+        padding: 0.2em 0.57em;
+    }
+    
+    #markBtn {
+        padding: 0.2em 0.57em;
+    }
+    
+    #deleteBtn {
+        padding: 0.2em 0.57em;
+        align-content: center;
+    }
+    
+    #editBtn {
+        padding: 0.2em 0.57em;
+    }
+    
+    .inTable .content.paper-button {
+        padding: 0.3em 0.57em;
+    }
+    
+    .zoneBtn .content.paper-button {
+        padding: 0.2em 0.57em;
+    }
+    
+    .resetBtn {
+        padding: 0.2em 0.57em;
+    }
+</style>
+
+<style>
+    #dropdown {
+        width: 130px;
+    }
+    /*
+    td{
+      width: 130px;
+    }
+*/
+    
+    #widthSetting {
+        width: 180px;
+    }
+    
+    .px-pagination {
+        display: inline-block !important;
+        padding-left: 0 !important;
+        margin: 20px 0 !important;
+    }
+    
+    #selectLocation {
+        height: 450px
+    }
+    
+    #d1 {
+        position: absolute;
+        top: 411px;
+    }
+    
+    #d2 {
+        position: absolute;
+        top: 454px;
+    }
+    
+    #map-view {
+        width: 63.5%;
+        float: left;
+    }
+    
+    #map-button {
+        position: relative;
+        float: right;
+        width: 35.5%;
+    }
+    
+    .siteBackground {
+        margin-bottom: 0px;
+        padding: 0px 4px 10px 10px;
+        margin-top: -2px;
+        background-color: white;
+    }
+    
+    .customBtn {
+        border: none;
+        padding: 14px;
+        color: #fff;
+        margin: 0 10px;
+        background: #4ea7d1 !important;
+        font-weight: 100;
+        border-radius: 3px;
+    }
+    
+    .active {
+        background-color: #016593 !important;
+    }
+    
+    .sos-directive {
+        position: absolute;
+        top: 6px;
+        right: 60px;
+        width: auto;
+        height: auto;
+        padding: 6px 6px 6px 6px;
+    }
+
+      #pac-input {
+        background-color: #fff;
+        font-family: Roboto;
+        font-size: 15px;
+        font-weight: 300;
+        margin-left: 14px;
+        padding: 0 11px 0 13px;
+        text-overflow: ellipsis;
+        width: 210px;
+        margin-top: 3%;
+      }
+
+      #pac-input:focus {
+        border-color: #4d90fe;
+      }
+
+</style>
+
+
+
+
+<px-card header-text="Site Information" class="siteBackground">
+    <div class="sos-directive">
+        <sos-directive data="pendingRes"></sos-directive>
+    </div>
+    <div class="help-tip">
+        <p>Please edit the information and hit Enter to Save.</p>
+    </div>
+
+    <div class="logOut" ng-click="logOut()">
+        <img src="../images/logout.png">
+        <p>Log Out</p>
+
+    </div>
+    <paper-button toggles class="custom blue top-right" ng-click="addSite()"><i class="icon-plus pull-left"></i> Add New Site</paper-button>
+    <br>
+    <br>
+    <px-data-table id="mytable" table-data="{{finalData}}" sortable table-rows="true" editable striped filterable>
+        <!--  <px-data-table-column name = "companyId"  filterable sortable></px-data-table-column> -->
+        <px-data-table-column name="siteName" label="Site Name" editable filterable sortable></px-data-table-column>
+        <px-data-table-column name="locationName" label="Location Name" filterable sortable></px-data-table-column>
+        <px-data-table-column name="latitude" label="Latitude" editable filterable sortable></px-data-table-column>
+        <px-data-table-column name="longitude" label="Longitude" editable filterable sortable></px-data-table-column>
+        <px-data-table-column name="zoom" label="Zoom Level" editable filterable sortable></px-data-table-column>
+        <px-data-table-column name="isActive" label="Is Active" editable filterable sortable></px-data-table-column>
+        <px-data-table-column name="viewMap" type="html" label="View Map" filterable sortable></px-data-table-column>
+        <px-data-table-column name="delete" type="html" label=" " editable></px-data-table-column>
+
+    </px-data-table>
+
+    <paper-dialog id="addSiteDialog" modal class="colored" style=" border:4px solid black">
+
+
+        <div class="modal-header" style=" border-bottom: 2px solid black">
+
+            <paper-button class="close widthOl" ng-click ="clearSite()"dialog-dismiss>&times; </paper-button>
+            <h4 class="modal-title"><b>Add New Site </b></h4>
+        </div>
+        <div id="formError" class="alert-danger">
+            <strong>{{errorMessage}} </strong>
+        </div>
+        <!--<span style="color:red">{{errorMessage}}</span>-->
+        <div class="modal-body">
+            <table>
+                <tr>
+                    <td>
+                        <paper-item>Location : </paper-item>
+                    </td>
+                    <td>
+                        <div id="dropdown">
+                            <px-dropdown id="locDropDown" display-value="Select Location" selected-key="1">
+                                <px-dropdown-content extend-dropdown='true' extend-dropdown-by='25' max-cont-character-width='10' items={{locDataPx}}>
+                                </px-dropdown-content>
+                            </px-dropdown>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <paper-item>Site Name : </paper-item>
+                    </td>
+                    <td>
+                        <div id="dropdown">
+                            <paper-input name="name" id="siteName" label="Site Name">
+                    </td>
+                    </div>
+                </tr>
+                <tr>
+                    <td>
+                        <paper-item>Site Description : </paper-item>
+                    </td>
+                    <td>
+                        <div id="dropdown">
+                            <paper-input name="name" id="siteDesc" label="Site Description">
+
+                            </paper-input>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <paper-item>Latitude : </paper-item>
+                    </td>
+                    <td>
+
+                        <div id="dropdown">
+                            <paper-icon-button icon="maps:add-location" ng-click="toggleMap()" style="float: right" title="Add Location">
+                            </paper-icon-button>
+                            <paper-input name="name" id="siteLat" label="Latitude" disabled></paper-input>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <paper-item>Longitude : </paper-item>
+                    </td>
+                    <td>
+                        <div id="dropdown">
+                            <paper-input name="name" id="siteLng" label="Longitude" disabled>
+
+                            </paper-input>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <paper-item>Zoom : </paper-item>
+                    </td>
+                    <td>
+                        <div id="dropdown">
+
+                            <paper-input name="name" id="siteZoom" label="Zoom">
+
+                            </paper-input>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <paper-item>Is Active : </paper-item>
+                    </td>
+                    <td>
+                        <div id="widthSetting">
+                            <paper-checkbox id="siteActive"></paper-checkbox>
+                            <!--                        <input type = "checkbox" ng-model="isActiveFlag" />-->
+                        </div>
+                    </td>
+                </tr>
+
+            </table>
+        </div>
+
+        <div class="modal-footer">
+            <paper-button class="cancel" ng-click ="clearSite()" dialog-dismiss>Cancel</paper-button>
+            <paper-button class="custom blue" id="confirmForm" class="custom blue" dialog-confirm ng-click="saveNewSite()">OK</paper-button>
+        </div>
+    </paper-dialog>
+
+    <paper-dialog id="showMap" modal class="colored" style=" border:4px solid black;height: 584px;width: 584px;top:96px;">
+
+        <div class="modal-header" style="height: 5px; margin: -2% 0% -2% 18%;">
+            <paper-button class="close widthOl" dialog-dismiss>&times; </paper-button>
+            <h4 class="modal-title">
+                <center><b>Select Location</b></center>
+            </h4>
+        </div>
+        <br>
+        <div id="inputWrapper">
+        <!--<input id="pac-input" class="controls" type="text" placeholder="Search Box">-->
+        </div>
+        <google-map id="selectLocation" click-events="true" latitude="37.77493" longitude="-122.41942" scrollable>
+        </google-map>
+
+    </paper-dialog>
+
+    <px-card ng-show="showMapPx" id="mapContent" style="padding-bottom: 1%">
+        <div>
+            <!--div style="margin-left: 713px;
+    position: relative;
+    margin-top: 2%;"-->
+            <div id="map-button">
+                <input type="radio" ng-model="myVar" value="sitePerimeter" ng-click="radioClicked('sitePerimeter')">Site
+                Perimeter &nbsp;&nbsp;
+                <input type="radio" ng-model="myVar" value="siteZone" ng-click="radioClicked('siteZone')">Site Zone
+
+                <br>
+                <!--<div ng-show="showError" ng-bind="errorMessageSite" style="color: red"></div>-->
+                <div ng-switch="myVar">
+                    <div ng-switch-when="siteZone">
+                        <br>
+                        <paper-button toggles class="custom blue custBtn" ng-model="inZone" ng-click="ZoneClicked(true,false)" value="CreateZone"
+                            style="height:27px; background-color: #4ea7d1 !important;">
+                            <p style="margin-top:-5%"><i class="icon-plus pull-left"></i> Create Zone Center</p>
+                            </paper-button>
+                            <paper-button toggles class="custom blue custBtn" ng-model="inZone" ng-click="ZoneClicked(false,true)" value="EditZone" style="height:27px; background-color: #4ea7d1 !important;">
+                                <p style="margin-top:-7%"><i class="icon-plus pull-left"></i> Create Zone</p>
+                            </paper-button>
+
+                            <br>
+                            <br>
+                            <div ng-show="CreateZone">
+                                Zone Type*: <select id="selectZone" ng-click="selectAction(myZone)" ng-model="myZone" ng-options="value.name as value.name for value in myZones"><option id="selectZoneDefault" value="" disabled selected hidden>Select Zone</option></select><br>
+                                <div ng-show="showCreateTable">
+                                    <br>
+                                    <table>
+                                        <tr>
+                                            <td style="padding-right: 6px">Low Lying Area:</td>
+
+                                            <td style="padding-right:12px;"><input id="selectZoneYesRadio" type="radio" ng-model="myVar1" value="yes" ng-click="radioClick('yes')">Yes</td>
+                                            <td>
+                                                <div ng-switch="myVar1">
+                                                    <div ng-switch-when="yes">
+                                                        <select id="weather" ng-change="selectActions(myZoneWeather)" ng-model="myZoneWeather">
+                                                <option id="selectZoneAreaYes" value="" disabled selected hidden>Select Zone</option>
+                                                <option value="light rain">Light Rain</option>
+                                                <option value="heavy rain">Heavy Rain</option>
+                                                <option value="cloudy">Cloudy</option>
+                                                </select>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <tr>
+                                                <td>&nbsp;</td>
+                                                <td colspan="2"><input id="selectZoneNoRadio" type="radio" ng-model="myVar1" value="no" ng-click="radioClick('no')">No</td>
+                                            </tr>
+                                    </table>
+                                    <paper-input id="lat" label="Latitude" disabled></paper-input>
+                                    <paper-input id="long" label="Longitude" disabled></paper-input>
+                                    <paper-input id="zoneName" label="Enter Zone Name"></paper-input><br>
+                                    <div id="d1">
+                                        Effective Date:
+                                        <div style="float: right; position: absolute; margin-left: 105%; margin-top: -20%;">
+                                            <px-datetime-picker id="effectiveDate" date-format="DD/MM/YY" time-format="HH:mm:ss.SSS" time-zone="Asia/Kolkata" show-time-zone="none"></px-datetime-picker>
+                                        </div>
+                                    </div>
+                                    <!--                    <input type="date" name="bday" id="effectiveDate">-->
+
+                                    <br>
+                                    <div id="d2">
+                                        End Date: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                        <div style="float: right; position: absolute; margin-left: 105%; margin-top: -20%;">
+                                            <px-datetime-picker id="endDate" date-format="DD/MM/YY" time-format="HH:mm:ss.SSS" time-zone="Asia/Kolkata" show-time-zone="none"></px-datetime-picker>
+                                        </div>
+                                    </div>
+                                    <!--                    <input type="date" name="bday" id="endDate">-->
+                                    <br><br><br>
+                                    <paper-button toggles class="custom blue custBtn" ng-click="saveCenter()" style="height:27px; background-color: #4ea7d1 !important;">
+                                        <p style="margin-top:-8%">Save Center</p>
+                                    </paper-button>
+
+                                </div>
+                            </div>
+                            <div ng-show="EditZone">
+                                <!--Zone Type* : <select ng-change="selectActionUpdate(myZone)" ng-model="myZone" ng-options="value.name as value.name for value in myZones"></select>
+                        <br> <br>-->
+                                <!--
+                <br>
+                    Latitude :<paper-input  id="editLat" disabled></paper-input><br>
+                    Longitude :<paper-input id="editLong" disabled></paper-input><br>
+                    <paper-input id="editZoneName" label="Enter Zone Name"></paper-input><br>
+                    Effective Date : <input type="date" name="bday" id="editEffectiveDate"><br>
+                    End Date : <input type="date" name="bday" id="editEndDate"><br><br>
+
+-->
+                                <table width="290px">
+                                    <tr>
+                                        <td align="center">
+                                            <paper-button id="markBtn" class="custom blue zoneBtn" ng-click="markZone()" style="height:27px; background-color: #4ea7d1 !important;">
+                                                <p style="margin-top:-13%">Mark Zone</p>
+                                            </paper-button>
+
+                                        </td>
+                                        <td align="center">
+                                            <paper-button id="editBtn" class="custom blue zoneBtn" ng-click="deleteZone('edit')" style="height:27px; background-color: #4ea7d1 !important;">
+                                                <p style="margin-top:-14%">Edit Zone</p>
+                                            </paper-button>
+
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan=2>&nbsp;</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td align="center">
+                                            <paper-button id="updateBtn" class="custom blue zoneBtn" ng-click="updateZone()" style="height:27px; background-color: #4ea7d1 !important;">
+                                                <p style="margin-top:-19%">Update</p>
+                                            </paper-button>
+
+                                        </td>
+                                        <td align="center">
+                                            <paper-button id="deleteBtn" class="custom blue zoneBtn" ng-click="deleteDialog()" style="height:27px; background-color: #4ea7d1 !important;">
+                                                <p style="margin-top:-21%">Delete</p>
+                                            </paper-button>
+
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan=2>&nbsp;</td>
+                                    </tr>
+
+                                </table>
+
+                            </div>
+                    </div>
+                    <div ng-switch-when="sitePerimeter">
+                        <br>
+                        <div class="container" style="margin-left:-5%">
+                            <table>
+                                <tr>
+                                    <td align="center">
+                                        <paper-button class="customBtn" ng-disabled="!(resetDisable)" ng-class="{'active': !(resetDisable)}" ng-click="saveBoundry()"
+                                            style="height:27px; padding:11px 0px 0px 0px;">
+                                            <p style="margin-top:-17%">Save Boundary</p>
+                                            </paper-button>
+
+                                    </td>
+                                    <td align="center">
+                                        <paper-button id="resetBtn" class="customBtn" ng-disabled="resetDisable" ng-class="{'active': resetDisable}" ng-click="resetSiteBoundryMsg()"
+                                            style="height:27px; padding:13px 0px 0px 0px;">
+                                            <p style="margin-top:-17%">Reset Boundary</p>
+                                            </paper-button>
+
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--div style="width:64.5% ; padding-top:2%;"-->
+        <div id="map-view">
+            <google-map id="siteMap" class="siteMap" style="height:600px; border:solid 1px #016593">
+            </google-map>
+            <br>
+        </div>
+        <paper-dialog id="zoneWeatherMsg" modal class="colored" style=" border:4px solid black">
+            <div class="modal-header">
+                <paper-button class="close widthOl" dialog-dismiss>&times; </paper-button>
+                <h4 class="modal-title"><b>Digital Safety Tool </b></h4>
+            </div>
+            <div class="modal-body">
+                <p> Please select the type of low lying area</p><br>
+            </div>
+            <div class="modal-footer">
+                <paper-button class="custom blue" dialog-dismiss>Ok</paper-button>
+            </div>
+        </paper-dialog>
+        <paper-dialog id="zoneCenterMsg" modal class="colored" style=" border:4px solid black">
+            <div class="modal-header">
+                <paper-button class="close widthOl" dialog-dismiss>&times; </paper-button>
+                <h4 class="modal-title"><b>Digital Safety Tool </b></h4>
+            </div>
+            <div class="modal-body">
+                <p> Please select the Zone Type and center point of the zone by clicking on the map</p><br>
+            </div>
+            <div class="modal-footer">
+                <paper-button class="custom blue" dialog-dismiss>Ok</paper-button>
+            </div>
+
+        </paper-dialog>
+        <paper-dialog id="markerClickMsg" modal class="colored" style=" border:4px solid black">
+            <div class="modal-header">
+                <paper-button class="close widthOl" dialog-dismiss>&times; </paper-button>
+                <h4 class="modal-title"><b>Digital Safety Tool </b></h4>
+            </div>
+            <div class="modal-body">
+                <p> Please select the center point of the zone inside the site boundry</p><br>
+            </div>
+            <div class="modal-footer">
+                <paper-button class="custom blue" dialog-dismiss>Ok</paper-button>
+            </div>
+        </paper-dialog>
+        <paper-dialog id="zoneEditMsg" modal class="colored" style=" border:4px solid black">
+            <div class="modal-header">
+                <paper-button class="close widthOl" dialog-dismiss>&times; </paper-button>
+                <h4 class="modal-title"><b>Digital Safety Tool </b></h4>
+            </div>
+            <div class="modal-body">
+                <p> The zone boundary will be removed.</p><br>
+            </div>
+            <div class="modal-footer">
+                <paper-button class="custom blue" dialog-dismiss>Ok</paper-button>
+            </div>
+        </paper-dialog>
+        <paper-dialog id="zoneDeleteMsg" modal class="colored" style=" border:4px solid black">
+            <div class="modal-header">
+                <paper-button class="close widthOl" dialog-dismiss>&times; </paper-button>
+                <h4 class="modal-title"><b>Digital Safety Tool </b></h4>
+            </div>
+            <div class="modal-body">
+                <p> Do you want to delete the selected zone boundry?</p><br>
+            </div>
+            <div class="modal-footer">
+                <paper-button class="cancel" dialog-dismiss>Cancel</paper-button>
+                <paper-button class="custom blue" dialog-dismiss ng-click="deleteZone('delete')">Delete</paper-button>
+            </div>
+        </paper-dialog>
+
+        <paper-dialog id="resetSiteAlert" modal class="colored" style=" border:4px solid black">
+            <div class="modal-header">
+                <paper-button class="close widthOl" dialog-dismiss>&times; </paper-button>
+                <h4 class="modal-title"><b>Digital Safety Tool </b></h4>
+            </div>
+            <div class="modal-body">
+                <p> Do you want to delete the selected Site boundry?</p><br>
+            </div>
+            <div class="modal-footer">
+                <paper-button class="cancel" dialog-dismiss>Cancel</paper-button>
+                <paper-button class="custom blue" dialog-dismiss ng-click="resetSiteBoundry()">Reset</paper-button>
+            </div>
+        </paper-dialog>
+
+        <paper-dialog id="errorMSg" modal class="colored" style=" border:4px solid black">
+            <div class="modal-header">
+                <paper-button class="close widthOl" dialog-dismiss>&times; </paper-button>
+                <h4 class="modal-title"><b>Digital Safety Tool </b></h4>
+            </div>
+            <div class="modal-body">
+                <p> Please select more than two markers </p><br>
+            </div>
+            <div class="modal-footer">
+                <paper-button class="cancel" dialog-dismiss>Cancel</paper-button>
+                <paper-button class="custom blue" dialog-dismiss >OK</paper-button>
+            </div>
+        </paper-dialog>
+
+        <paper-dialog id="selectZoneMarkerMsg" modal class="colored" style=" border:4px solid black">
+            <div class="modal-header">
+                <paper-button class="close widthOl" dialog-dismiss>&times; </paper-button>
+                <h4 class="modal-title"><b>Digital Safety Tool </b></h4>
+            </div>
+            <div class="modal-body">
+                <p> Please select zone marker first !!!</p><br>
+            </div>
+            <div class="modal-footer">
+                <paper-button class="cancel" dialog-dismiss>Cancel</paper-button>
+                <paper-button class="custom blue" dialog-dismiss>Ok</paper-button>
+            </div>
+        </paper-dialog>
+
+        <paper-dialog id="siteBoundryMsg" modal class="colored" style=" border:4px solid black">
+            <div class="modal-header">
+                <paper-button class="close widthOl" dialog-dismiss>&times; </paper-button>
+                <h4 class="modal-title">Digital Safety Tool </h4>
+            </div>
+            <div class="modal-body">
+                <p> Existing site boundry will reset </p><br>
+            </div>
+            <div class="modal-footer">
+                <paper-button class="custom blue" dialog-dismiss ng-click="resetSiteBoundry()">Ok</paper-button>
+                <paper-button class="cancel" dialog-dismiss>Cancel</paper-button>
+            </div>
+        </paper-dialog>
+
+
+        <paper-dialog id="welcomeSitePerimeterMsg" modal class="colored" style=" border:4px solid black">
+            <div class="modal-header">
+                <paper-button class="close widthOl" dialog-dismiss>&times; </paper-button>
+                <h4 class="modal-title">Digital Safety Tool </h4>
+            </div>
+            <div class="modal-body">
+                <p> Welcome to Site Perimeter</p><br>
+            </div>
+            <div class="modal-footer">
+                <paper-button class="custom blue" dialog-dismiss ng-click="">Ok</paper-button>
+                <paper-button class="cancel" dialog-dismiss>Cancel</paper-button>
+            </div>
+        </paper-dialog>
+
+
+        <paper-dialog id="alreadySitePerimeterExist" modal class="colored" style=" border:4px solid black">
+            <div class="modal-header">
+                <paper-button class="close widthOl" dialog-dismiss>&times; </paper-button>
+                <h4 class="modal-title">Digital Safety Tool </h4>
+            </div>
+            <div class="modal-body">
+                <p>  </p><br>
+            </div>
+            <div class="modal-footer">
+                <paper-button class="custom blue" dialog-dismiss ng-click="">Ok</paper-button>
+                <paper-button class="cancel" dialog-dismiss>Cancel</paper-button>
+            </div>
+        </paper-dialog>
+
+        <paper-dialog id="welcomeSitePerimeterMsgFirst" modal class="colored" style=" border:4px solid black">
+            <div class="modal-header">
+                <paper-button class="close widthOl" dialog-dismiss>&times; </paper-button>
+                <h4 class="modal-title">Digital Safety Tool </h4>
+            </div>
+            <div class="modal-body">
+                <p> Welcome to Site Perimeter</p><br>
+            </div>
+            <div class="modal-footer">
+                <paper-button class="custom blue" dialog-dismiss ng-click="drawMarker()">Ok</paper-button>
+                <paper-button class="cancel" dialog-dismiss>Cancel</paper-button>
+            </div>
+        </paper-dialog>
+
+
+
+        <paper-dialog id="zoneBoundryMsg" modal class="colored" style=" border:4px solid black">
+            <div class="modal-header">
+                <paper-button class="close widthOl" dialog-dismiss>&times; </paper-button>
+                <h4 class="modal-title"><b>Digital Safety Tool </b> </h4>
+            </div>
+            <div class="modal-body">
+                <p> Please click on a marker to add/edit zone</p><br>
+            </div>
+            <div class="modal-footer">
+                <paper-button class="custom blue" dialog-dismiss ng-click="editZoneBoundry()">Ok</paper-button>
+                <paper-button class="cancel" dialog-dismiss>Cancel</paper-button>
+            </div>
+        </paper-dialog>
+        <paper-dialog id="saveBoundryMsg" modal class="colored" style=" border:4px solid black">
+            <div class="modal-header">
+                <paper-button class="close widthOl" dialog-dismiss>&times; </paper-button>
+                <h4 class="modal-title">Digital Safety Tool </h4>
+            </div>
+            <div class="modal-body">
+                <p> Boundary has been saved.</p><br>
+            </div>
+            <div class="modal-footer">
+                <paper-button class="custom blue" dialog-dismiss>Ok</paper-button>
+                <paper-button class="cancel" dialog-dismiss>Cancel</paper-button>
+            </div>
+
+        </paper-dialog>
+        <paper-dialog id="saveCentrePointMsg" modal class="colored" style=" border:4px solid black">
+            <div class="modal-header">
+                <paper-button class="close widthOl" dialog-dismiss>&times; </paper-button>
+                <h4 class="modal-title">Digital Safety Tool </h4>
+            </div>
+            <div class="modal-body">
+                <p> Centre point of the zone has been saved.</p><br>
+            </div>
+            <div class="modal-footer">
+                <paper-button class="custom blue" dialog-dismiss>Ok</paper-button>
+                <paper-button class="cancel" dialog-dismiss>Cancel</paper-button>
+            </div>
+
+        </paper-dialog>
+
+    </px-card>
+
+</px-card>
+
+<script>
+    function showMap(siteId, lat, long, zoom) {
+        $("html, body").animate({ scrollTop: $(document).height() - $('#mapContent').height() - 100 });
+        console.log('e----------- ', lat, long, zoom)
+        var scopeEle2 = angular.element(document.getElementById('mytable')).scope();
+        //alert(this.columnCount);
+        scopeEle2.showMap(siteId, lat, long, zoom);
+    }
+    function deleteSite(siteId) {
+        var scopeEle3 = angular.element(document.getElementById('mytable')).scope();
+        scopeEle3.deleteSite(siteId);
+    }
+
+</script>
